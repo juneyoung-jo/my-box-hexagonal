@@ -1,4 +1,4 @@
-package young.myboxhexagonal
+package com.young.myboxhexagonal
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
