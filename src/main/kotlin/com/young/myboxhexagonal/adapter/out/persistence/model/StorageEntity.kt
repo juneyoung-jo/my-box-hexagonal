@@ -1,6 +1,7 @@
 package com.young.myboxhexagonal.adapter.out.persistence.model
 
 import com.young.myboxhexagonal.common.type.StorageExtType
+import com.young.myboxhexagonal.domain.Storage
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -25,3 +26,12 @@ class StorageEntity(
     val extType: StorageExtType
 
 ) : BaseEntity()
+
+fun StorageEntity.toDomain() =
+    Storage(
+        id = this.id,
+        parentStorageId = parentStorageId,
+        storageName = storageName,
+        storageFileSize = storageFileSize,
+        extType = extType
+    )
