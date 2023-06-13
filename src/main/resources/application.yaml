@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mybox?useSSL=false&characterEncoding=UTF-8&tlsVersion=TLSv1:2&serverTimezone=UTC
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+#        default_batch_fetch_size: 100
+#        show_sql: true
+        format_sql: true
+    open-in-view: false
+#  jackson:
+#    property-naming-strategy: SNAKE_CASE
+#    deserialization:
+#      FAIL_ON_NULL_FOR_PRIMITIVES: true
+logging:
+  level:
+    ROOT: info
+    org.hibernate.SQL: debug
+#  org.hibernate.type: trace
