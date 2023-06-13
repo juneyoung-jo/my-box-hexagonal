@@ -5,22 +5,11 @@ import org.springframework.http.codec.multipart.FilePart
 
 
 interface StorageUseCase {
-    fun getStorageById(
-        userId: String,
-        storageId: String
-    ): Storage
+    fun getStorageById(storageId: String): Storage
 
-    fun getStorageByParentStorageId(
-        userId: String,
-        parentStorageId: String
-    ): Storage
-
-    fun getRootStorageByUserId(
-        userId: String
-    ): Storage
+    fun getStorageByParentStorageId(parentStorageId: String): Storage
 
     fun makeFolder(
-        userId: String,
         parentStorageId: String,
         folderName: String
     ): Storage
@@ -31,7 +20,6 @@ interface StorageUseCase {
 //    ): Tuple<Storage, Resource>
 
     fun saveStorage(
-        userId: String,
         parentStorageId: String,
         filePart: FilePart
     ): Storage

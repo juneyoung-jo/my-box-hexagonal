@@ -13,9 +13,6 @@ class StorageEntity(
     @Id
     var id: Long? = null,
 
-    @Column(nullable = false)
-    val userId: Long,
-
     val parentStorageId: Long? = null,
 
     @Column(nullable = false)
