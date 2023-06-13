@@ -1,4 +1,4 @@
-package com.young.myboxhexagonal.adapter.out.persistence
+package com.young.myboxhexagonal.adapter.out.persistence.model
 
 import com.young.myboxhexagonal.common.type.StorageExtType
 import jakarta.persistence.Column
