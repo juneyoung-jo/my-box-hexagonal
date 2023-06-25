@@ -2,16 +2,14 @@ package com.young.myboxhexagonal.adapter.out.persistence.model
 
 import com.young.myboxhexagonal.common.type.StorageExtType
 import com.young.myboxhexagonal.domain.Storage
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 //@DynamicUpdate
 @Entity
 @Table(name = "storages")
 class StorageEntity(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
     val parentStorageId: Long? = null,
@@ -23,6 +21,7 @@ class StorageEntity(
     val storageFileSize: Long,
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     val extType: StorageExtType
 
 ) : BaseEntity()
