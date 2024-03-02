@@ -3,6 +3,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/mybox?useSSL=false&characterEncoding=UTF-8&tlsVersion=TLSv1:2&serverTimezone=UTC
     username: root
+  data:
+    redis:
+      host: my-box
+      port: 6379
+      connect-timeout: 3000
+      timeout: 3000
   jpa:
     hibernate:
       ddl-auto: none
