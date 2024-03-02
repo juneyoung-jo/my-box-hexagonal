@@ -14,6 +14,9 @@ class StoragePersistenceAdapter(
     override fun findById(id: Long): Storage? =
         storageRepository.findStorageById(id)?.toDomain()
 
+    override fun findByIdForUpdate(id: Long): Storage? =
+        storageRepository.findByIdForUpdate(id)?.toDomain()
+
     override fun save(storage: Storage) =
         storageRepository.save(storage.toEntity()).toDomain()
 

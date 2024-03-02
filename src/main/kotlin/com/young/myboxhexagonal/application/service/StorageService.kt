@@ -15,7 +15,6 @@ class StorageService(
     private val storagePersistencePort: StoragePersistencePort
 ) : StorageUseCase {
 
-    @Transactional
     override fun getStorageById(storageId: Long): Storage =
         storagePersistencePort.findById(storageId) ?: throw ServiceException(StorageErrorCode.STORAGE_NOT_FOUND)
 
@@ -30,7 +29,7 @@ class StorageService(
 
     @Transactional
     override fun increaseFileSize(storageId: Long) =
-        getStorageById(storageId)
+        storagePersistencePort.findByIdForUpdate(storageId)!!
             .increaseFileSize()
             .run {
                 storagePersistencePort.save(this)
