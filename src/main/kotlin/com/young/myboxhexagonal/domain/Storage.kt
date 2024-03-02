@@ -6,6 +6,11 @@ data class Storage(
     var id: Long? = null,
     val parentStorageId: Long? = null,
     val storageName: String,
-    val storageFileSize: Long,
+    var storageFileSize: Long,
     val extType: StorageExtType
-)
+) {
+
+    fun increaseFileSize() = this.apply {
+        storageFileSize += 1
+    }
+}

@@ -4,5 +4,5 @@ import com.young.myboxhexagonal.domain.Storage
 
 interface StoragePersistencePort {
     fun findById(id: Long): Storage?
-    fun save(storage: Storage)
+    fun save(storage: Storage): Storage
 }

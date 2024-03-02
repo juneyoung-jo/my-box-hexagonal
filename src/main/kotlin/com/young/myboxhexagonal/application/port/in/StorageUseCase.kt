@@ -1,7 +1,7 @@
 package com.young.myboxhexagonal.application.port.`in`
 
+import com.young.myboxhexagonal.common.type.StorageExtType
 import com.young.myboxhexagonal.domain.Storage
-import org.springframework.http.codec.multipart.FilePart
 
 
 interface StorageUseCase {
@@ -14,13 +14,11 @@ interface StorageUseCase {
         folderName: String
     ): Storage
 
-    // TODO: 확인필요 
-//    fun downloadStorage(
-//        userId: String, storageId: String
-//    ): Tuple<Storage, Resource>
+    fun increaseFileSize(storageId: Long): Storage
 
     fun saveStorage(
-        parentStorageId: Long,
-        filePart: FilePart
+        storageName: String,
+        storageFileSize: Long,
+        extType: StorageExtType
     ): Storage
 }

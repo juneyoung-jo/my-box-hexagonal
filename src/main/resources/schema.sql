@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS STORAGES
 
 create table storages
 (
-    id                bigint       not null,
+    id  AUTO_INCREMENT   bigint       not null,
     parent_storage_id bigint,
     ext_type          varchar(255) not null,
     storage_name      varchar(255) not null,

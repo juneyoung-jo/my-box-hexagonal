@@ -25,12 +25,3 @@ class StorageEntity(
     val extType: StorageExtType
 
 ) : BaseEntity()
-
-fun StorageEntity.toDomain() =
-    Storage(
-        id = this.id,
-        parentStorageId = parentStorageId,
-        storageName = storageName,
-        storageFileSize = storageFileSize,
-        extType = extType
-    )
