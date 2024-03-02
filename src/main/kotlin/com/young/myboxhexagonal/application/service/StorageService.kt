@@ -1,5 +1,6 @@
 package com.young.myboxhexagonal.application.service
 
+import com.young.myboxhexagonal.application.adapter.LockManager
 import com.young.myboxhexagonal.application.exception.ServiceException
 import com.young.myboxhexagonal.application.exception.StorageErrorCode
 import com.young.myboxhexagonal.application.port.`in`.StorageUseCase
@@ -12,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class StorageService(
-    private val storagePersistencePort: StoragePersistencePort
+    private val storagePersistencePort: StoragePersistencePort,
+    private val lockManager: LockManager
 ) : StorageUseCase {
 
     override fun getStorageById(storageId: Long): Storage =
@@ -36,6 +38,14 @@ class StorageService(
             }
 
     @Transactional
+    fun increaseFileSizeNonLock(storageId: Long): Storage =
+        storagePersistencePort.findById(storageId)!!
+            .increaseFileSize()
+            .run {
+                storagePersistencePort.save(this)
+            }
+
+    @Transactional
     override fun saveStorage(
         storageName: String,
         storageFileSize: Long,
@@ -48,5 +58,18 @@ class StorageService(
                 extType = extType
             )
         )
+
+}
+
+@Service
+class LockService(
+    private val lockManager: LockManager,
+    private val storageService: StorageService
+) {
+
+    fun increaseFileSizeWithRedisLock(storageId: Long): Storage =
+        lockManager.lock(key = storageId.toString()) {
+            storageService.increaseFileSizeNonLock(storageId)
+        }
 
 }
