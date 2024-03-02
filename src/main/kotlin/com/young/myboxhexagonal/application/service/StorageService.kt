@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional
 class StorageService(
     private val storagePersistencePort: StoragePersistencePort
 ) : StorageUseCase {
+
+    @Transactional
     override fun getStorageById(storageId: Long): Storage =
         storagePersistencePort.findById(storageId) ?: throw ServiceException(StorageErrorCode.STORAGE_NOT_FOUND)
 
@@ -31,7 +33,6 @@ class StorageService(
         getStorageById(storageId)
             .increaseFileSize()
             .run {
-                println("this = ${this}")
                 storagePersistencePort.save(this)
             }
 
