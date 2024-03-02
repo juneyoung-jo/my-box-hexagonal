@@ -2,12 +2,15 @@ package com.young.myboxhexagonal.application.adapter
 
 import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
 
 @Component
 class LockManager(
-    private val redissonClient: RedissonClient
+    private val redissonClient: RedissonClient,
+    private val txAdvise: TxAdvise
 ) {
 
     /**
@@ -35,7 +38,9 @@ class LockManager(
         }
 
         return try {
-            func()
+            txAdvise.requireNew {
+                func()
+            }
         } finally {
             unlock(key)
         }
@@ -45,4 +50,11 @@ class LockManager(
         redissonClient.getLock(key).unlock()
     }
 
+}
+
+@Component
+class TxAdvise {
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun <T> requireNew(func: () -> T): T = func()
 }

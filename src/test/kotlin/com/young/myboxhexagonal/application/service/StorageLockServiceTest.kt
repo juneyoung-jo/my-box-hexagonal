@@ -15,9 +15,6 @@ internal class StorageLockServiceTest {
     @Autowired
     lateinit var storageService: StorageService
 
-    @Autowired
-    lateinit var lockService: LockService
-
     @Test
     @Order(1)
     fun 파일사이즈_증가_동시성_테스트_non_lock() {
@@ -70,7 +67,7 @@ internal class StorageLockServiceTest {
 
         for (i in 1..size) {
             executorService.execute {
-                lockService.increaseFileSizeWithRedisLock(1)
+                storageService.increaseFileSizeWithRedisLock(1)
                 countDownLatch.countDown()
             }
         }

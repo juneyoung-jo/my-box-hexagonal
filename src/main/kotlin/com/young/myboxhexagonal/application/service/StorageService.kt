@@ -30,6 +30,14 @@ class StorageService(
     }
 
     @Transactional
+    fun increaseFileSizeNonLock(storageId: Long): Storage =
+        storagePersistencePort.findById(storageId)!!
+            .increaseFileSize()
+            .run {
+                storagePersistencePort.save(this)
+            }
+
+    @Transactional
     override fun increaseFileSize(storageId: Long) =
         storagePersistencePort.findByIdForUpdate(storageId)!!
             .increaseFileSize()
@@ -37,13 +45,14 @@ class StorageService(
                 storagePersistencePort.save(this)
             }
 
-    @Transactional
-    fun increaseFileSizeNonLock(storageId: Long): Storage =
-        storagePersistencePort.findById(storageId)!!
-            .increaseFileSize()
-            .run {
-                storagePersistencePort.save(this)
-            }
+    fun increaseFileSizeWithRedisLock(storageId: Long): Storage =
+        lockManager.lock(key = storageId.toString()) {
+            storagePersistencePort.findById(storageId)!!
+                .increaseFileSize()
+                .run {
+                    storagePersistencePort.save(this)
+                }
+        }
 
     @Transactional
     override fun saveStorage(
@@ -58,18 +67,5 @@ class StorageService(
                 extType = extType
             )
         )
-
-}
-
-@Service
-class LockService(
-    private val lockManager: LockManager,
-    private val storageService: StorageService
-) {
-
-    fun increaseFileSizeWithRedisLock(storageId: Long): Storage =
-        lockManager.lock(key = storageId.toString()) {
-            storageService.increaseFileSizeNonLock(storageId)
-        }
 
 }
