@@ -3,6 +3,6 @@ services :
   redis:
     image: redis:latest
     container_name: redis
-    hostname: my-box
+    hostname: localhost
     ports:
       - "6379:6379"
