@@ -26,27 +26,31 @@ class LockManager(
         leaseTime: Long = 3000L,
         func: () -> R
     ): R {
-        val available = redissonClient.getLock(key)
-            .tryLock(
-                waitTime,
-                leaseTime,
-                timeUnit
-            )
+        try {
+            val available = redissonClient.getLock(key)
+                .tryLock(
+                    waitTime,
+                    leaseTime,
+                    timeUnit
+                )
 
-        if (!available) {
-            throw RuntimeException("Can't lock")
-        }
+            if (!available) {
+                throw RuntimeException("Can't lock")
+            }
 
-        return try {
-            txAdvise.requireNew {
+            println("get Lock = ${Thread.currentThread()}")
+            return txAdvise.requireNew {
                 func()
             }
+        } catch (e: InterruptedException) {
+            throw InterruptedException()
         } finally {
             unlock(key)
         }
     }
 
     private fun unlock(key: String) {
+        println("unLock = ${Thread.currentThread()}")
         redissonClient.getLock(key).unlock()
     }
 

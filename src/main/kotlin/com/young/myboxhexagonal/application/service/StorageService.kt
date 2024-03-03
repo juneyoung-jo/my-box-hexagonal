@@ -1,5 +1,6 @@
 package com.young.myboxhexagonal.application.service
 
+import com.young.myboxhexagonal.application.aop.DistributedLock
 import com.young.myboxhexagonal.application.adapter.LockManager
 import com.young.myboxhexagonal.application.exception.ServiceException
 import com.young.myboxhexagonal.application.exception.StorageErrorCode
@@ -8,6 +9,7 @@ import com.young.myboxhexagonal.application.port.out.StoragePersistencePort
 import com.young.myboxhexagonal.common.type.StorageExtType
 import com.young.myboxhexagonal.domain.Storage
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 
@@ -45,6 +47,7 @@ class StorageService(
                 storagePersistencePort.save(this)
             }
 
+    @Transactional(propagation = Propagation.NEVER)
     fun increaseFileSizeWithRedisLock(storageId: Long): Storage =
         lockManager.lock(key = storageId.toString()) {
             storagePersistencePort.findById(storageId)!!
@@ -53,6 +56,14 @@ class StorageService(
                     storagePersistencePort.save(this)
                 }
         }
+
+    @DistributedLock(key = "#storageId")
+    fun increaseFileSizeWithRedisLockAop(storageId: Long): Storage =
+        storagePersistencePort.findById(storageId)!!
+            .increaseFileSize()
+            .run {
+                storagePersistencePort.save(this)
+            }
 
     @Transactional
     override fun saveStorage(
@@ -67,5 +78,17 @@ class StorageService(
                 extType = extType
             )
         )
+
+}
+
+@Service
+class TxTestService(
+    private val storageService: StorageService
+) {
+    @Transactional
+    fun txTest(storageId: Long) {
+        storageService.increaseFileSizeWithRedisLockAop(storageId)
+
+    }
 
 }
