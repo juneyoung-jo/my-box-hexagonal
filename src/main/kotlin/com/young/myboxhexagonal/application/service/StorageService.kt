@@ -1,7 +1,7 @@
 package com.young.myboxhexagonal.application.service
 
-import com.young.myboxhexagonal.application.aop.DistributedLock
 import com.young.myboxhexagonal.application.adapter.LockManager
+import com.young.myboxhexagonal.application.aop.DistributedLock
 import com.young.myboxhexagonal.application.exception.ServiceException
 import com.young.myboxhexagonal.application.exception.StorageErrorCode
 import com.young.myboxhexagonal.application.port.`in`.StorageUseCase
@@ -48,7 +48,17 @@ class StorageService(
             }
 
     @Transactional(propagation = Propagation.NEVER)
-    fun increaseFileSizeWithRedisLock(storageId: Long): Storage =
+    fun increaseFileSizeWithRedisLockByNonTransactional(storageId: Long): Storage =
+        lockManager.lock(key = storageId.toString()) {
+            storagePersistencePort.findById(storageId)!!
+                .increaseFileSize()
+                .run {
+                    storagePersistencePort.save(this)
+                }
+        }
+
+    @Transactional
+    fun increaseFileSizeWithRedisLockByTransactional(storageId: Long): Storage =
         lockManager.lock(key = storageId.toString()) {
             storagePersistencePort.findById(storageId)!!
                 .increaseFileSize()
@@ -88,7 +98,6 @@ class TxTestService(
     @Transactional
     fun txTest(storageId: Long) {
         storageService.increaseFileSizeWithRedisLockAop(storageId)
-
     }
 
 }

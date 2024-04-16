@@ -63,7 +63,7 @@ internal class StorageLockServiceTest {
 
     @Test
     @Order(3)
-    fun 파일사이즈_증가_동시성_테스트_redis_lock() {
+    fun 파일사이즈_증가_동시성_테스트_redis_lock_non_transactional() {
         val size = 10
         val executorService = Executors.newFixedThreadPool(size)
         val countDownLatch = CountDownLatch(size)
@@ -71,7 +71,29 @@ internal class StorageLockServiceTest {
 
         for (i in 1..size) {
             executorService.execute {
-                storageService.increaseFileSizeWithRedisLock(1)
+                storageService.increaseFileSizeWithRedisLockByNonTransactional(1)
+                countDownLatch.countDown()
+            }
+        }
+        countDownLatch.await()
+        val result: Long = storageService.getStorageById(1).storageFileSize
+        println("initFileSize = $initFileSize")
+        println("result = $result")
+        assertThat(result).isEqualTo(initFileSize + size)
+    }
+
+    @Disabled(value = "실패하는 테스트, disabled 처리 Deadlock")
+    @Test
+    @Order(4)
+    fun 파일사이즈_증가_동시성_테스트_redis_lock_transactional() {
+        val size = 10
+        val executorService = Executors.newFixedThreadPool(size)
+        val countDownLatch = CountDownLatch(size)
+        val initFileSize = storageService.getStorageById(1).storageFileSize
+
+        for (i in 1..size) {
+            executorService.execute {
+                storageService.increaseFileSizeWithRedisLockByTransactional(1)
                 countDownLatch.countDown()
             }
         }
@@ -83,7 +105,7 @@ internal class StorageLockServiceTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     fun 파일사이즈_증가_동시성_테스트_redis_lock_AOP() {
         val size = 10
         val executorService = Executors.newFixedThreadPool(size)
@@ -104,8 +126,8 @@ internal class StorageLockServiceTest {
     }
 
     @Test
-    @Disabled(value = "실패하는 테스트, disabled 처리")
-    @Order(5)
+    @Disabled(value = "실패하는 테스트, disabled 처리 Deadlock")
+    @Order(6)
     fun TxTestService에서_transactional매서드에서_lock_method를_호출할때() {
         val size = 10
         val executorService = Executors.newFixedThreadPool(size)
