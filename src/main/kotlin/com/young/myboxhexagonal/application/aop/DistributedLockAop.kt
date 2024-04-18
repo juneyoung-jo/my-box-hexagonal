@@ -12,6 +12,8 @@ import org.springframework.expression.spel.support.StandardEvaluationContext
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager.getCurrentTransactionName
+import org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive
 
 
 @Aspect
@@ -46,6 +48,7 @@ class DistributedLockAop(
             if (!available) {
                 return false
             }
+            println("tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
             println("get Lock aop = ${Thread.currentThread()}")
             aopForTransaction.proceed(joinPoint)
         } finally {
@@ -85,6 +88,7 @@ class CustomSpringELParser private constructor() {
 class AopForTransaction {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun proceed(joinPoint: ProceedingJoinPoint): Any {
+        println("new tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
         return joinPoint.proceed()
     }
 }

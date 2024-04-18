@@ -22,7 +22,7 @@ internal class StorageLockServiceTest {
     @Test
     @Order(1)
     fun 파일사이즈_증가_동시성_테스트_non_lock() {
-        val size = 10
+        val size = 100
         val executorService = Executors.newFixedThreadPool(size)
         val countDownLatch = CountDownLatch(size)
         val initFileSize = storageService.getStorageById(1).storageFileSize
@@ -43,7 +43,7 @@ internal class StorageLockServiceTest {
     @Test
     @Order(2)
     fun 파일사이즈_증가_동시성_테스트_db_lock() {
-        val size = 10
+        val size = 100
         val executorService = Executors.newFixedThreadPool(size)
         val countDownLatch = CountDownLatch(size)
         val initFileSize = storageService.getStorageById(1).storageFileSize
@@ -64,7 +64,7 @@ internal class StorageLockServiceTest {
     @Test
     @Order(3)
     fun 파일사이즈_증가_동시성_테스트_redis_lock_non_transactional() {
-        val size = 10
+        val size = 100
         val executorService = Executors.newFixedThreadPool(size)
         val countDownLatch = CountDownLatch(size)
         val initFileSize = storageService.getStorageById(1).storageFileSize
@@ -82,7 +82,7 @@ internal class StorageLockServiceTest {
         assertThat(result).isEqualTo(initFileSize + size)
     }
 
-    @Disabled(value = "실패하는 테스트, disabled 처리 Deadlock")
+//    @Disabled(value = "실패하는 테스트, disabled 처리 Deadlock")
     @Test
     @Order(4)
     fun 파일사이즈_증가_동시성_테스트_redis_lock_transactional() {

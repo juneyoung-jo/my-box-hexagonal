@@ -4,6 +4,8 @@ import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager.getCurrentTransactionName
+import org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive
 import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
 
@@ -38,14 +40,24 @@ class LockManager(
                 throw RuntimeException("Can't lock")
             }
 
+            // transaction의 이름과 transacitonal이 적용되었는지 확인
+            println("tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
             println("get Lock = ${Thread.currentThread()}")
             return txAdvise.requireNew {
+                // transaction의 이름과 new transacitonal 이 적용되었는지 확인
+                println("new tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
                 func()
             }
         } catch (e: InterruptedException) {
             throw InterruptedException()
         } finally {
-            unlock(key)
+            println("final tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
+            try {
+                unlock(key)
+            } catch (e: IllegalMonitorStateException) {
+                println("IllegalMonitorStateException")
+            }
+
         }
     }
 
@@ -59,6 +71,6 @@ class LockManager(
 @Component
 class TxAdvise {
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, timeout = 2)
     fun <T> requireNew(func: () -> T): T = func()
 }
