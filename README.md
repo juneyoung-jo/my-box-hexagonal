@@ -24,4 +24,9 @@ Java 17 / Spring Boot 3.1.0
 - Lock 경과시간 만료후 Lock 에 접근하게 될 수도 있습니다.
      만약 A 프로세스가 Lock 을 취득한 후 leaseTime 을 1초로 설정했다고 해봅시다.
      근데 A 프로세스의 작업이 2초가 걸리는 작업이였다면 이미 Lock 은 leaseTime 이 경과하여 도중에 해제가 되었을 테고, A 프로세스는 Lock 에 대해서 Monitor 상태가 아닌데 Lock 을 해제하려고 할 것 입니다.
-     따라서 IllegalMonitorStateException 이 발생하게 됩니다. 출처: https://devroach.tistory.com/83
+     따라서 IllegalMonitorStateException 이 발생하게 됩니다.
+
+# 참고자료
+- https://helloworld.kurly.com/blog/distributed-redisson-lock/
+- https://jongmin4943.tistory.com/entry/Spring-Redisson-%EB%B6%84%EC%82%B0%EB%9D%BDDistribute-Lock-%EC%A2%80-%EB%8D%94-%EC%9E%98-%EC%8D%A8%EB%B3%B4%EA%B8%B0-33-%ED%95%9C%EA%B3%84%EC%99%80-%EA%B7%B9%EB%B3%B5?category=1041393
+- https://devroach.tistory.com/83
