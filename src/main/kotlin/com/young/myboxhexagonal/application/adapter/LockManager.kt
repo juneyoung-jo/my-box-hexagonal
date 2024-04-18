@@ -28,31 +28,35 @@ class LockManager(
         leaseTime: Long = 3000L,
         func: () -> R
     ): R {
+
+        val available = redissonClient.getLock(key)
+            .tryLock(
+                waitTime,
+                leaseTime,
+                timeUnit
+            )
+
+        if (!available) {
+            println("lock 획득 실패")
+            throw RuntimeException("Can't lock")
+        }
+
         try {
-            val available = redissonClient.getLock(key)
-                .tryLock(
-                    waitTime,
-                    leaseTime,
-                    timeUnit
-                )
-
-            if (!available) {
-                throw RuntimeException("Can't lock")
-            }
-
+            println("lock 획득 시도" + key)
             // transaction의 이름과 transacitonal이 적용되었는지 확인
-            println("tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
-            println("get Lock = ${Thread.currentThread()}")
+//            println("tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
+//            println("get Lock = ${Thread.currentThread()}")
             return txAdvise.requireNew {
                 // transaction의 이름과 new transacitonal 이 적용되었는지 확인
-                println("new tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
+//                println("new tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
                 func()
             }
         } catch (e: InterruptedException) {
             throw InterruptedException()
         } finally {
-            println("final tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
+//            println("final tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
             try {
+                println("lock 해제")
                 unlock(key)
             } catch (e: IllegalMonitorStateException) {
                 println("IllegalMonitorStateException")
@@ -62,7 +66,7 @@ class LockManager(
     }
 
     private fun unlock(key: String) {
-        println("unLock = ${Thread.currentThread()}")
+//        println("unLock = ${Thread.currentThread()}")
         redissonClient.getLock(key).unlock()
     }
 

@@ -83,6 +83,10 @@ internal class StorageLockServiceTest {
     }
 
 //    @Disabled(value = "실패하는 테스트, disabled 처리 Deadlock")
+    /**
+     * transactional로 connection pool 점유로 인해 이슈 발생
+     * connection-poll-size 를 늘려서 실행시키면 잘 동작 함.
+     */
     @Test
     @Order(4)
     fun 파일사이즈_증가_동시성_테스트_redis_lock_transactional() {
@@ -126,7 +130,7 @@ internal class StorageLockServiceTest {
     }
 
     @Test
-    @Disabled(value = "실패하는 테스트, disabled 처리 Deadlock")
+//    @Disabled(value = "실패하는 테스트, disabled 처리 Deadlock")
     @Order(6)
     fun TxTestService에서_transactional매서드에서_lock_method를_호출할때() {
         val size = 10

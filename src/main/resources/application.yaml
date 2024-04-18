@@ -3,6 +3,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/mybox?useSSL=false&characterEncoding=UTF-8&tlsVersion=TLSv1:2&serverTimezone=UTC
     username: root
+    hikari:
+      maximum-pool-size: 15
   data:
     redis:
       host: localhost
@@ -14,8 +16,8 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-#        default_batch_fetch_size: 100
-#        show_sql: true
+    #        default_batch_fetch_size: 100
+#        show_sql: false
 #        format_sql: true
     open-in-view: false
 #  jackson:
@@ -25,5 +27,5 @@ spring:
 logging:
   level:
     ROOT: info
-    org.hibernate.SQL: debug
+#    org.hibernate.SQL: debug
 #  org.hibernate.type: trace

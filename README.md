@@ -14,6 +14,13 @@ Java 17 / Spring Boot 3.1.0
 - lock 은 transactional 과 함께 사용하려면 주의해야 함. 
     - transaction 보다 lock 이 더 먼저 적용되어야 함.
     - get lock > tx begin > tx commit > unlock 순으로 진행되어야 문제가 없음.
+    - lock 획득 후 실행되는 로직을 신규 트랜잭션으로 실행(REQUIRES_NEW)
+    - lock 매서드가 REQUIRES_NEW 로 신규 트랜잭션을 생성하더라도, 상위 트랜잭션으로부터 시작할 경우 connection 점유 이슈가 생긴다.
+      - spring.datasource.hikari.maximum-pool-size 를 잘 설정해야 함.
+      - tx A begin > lock 획득 > txB begin > tx B commit > unlock > tx A commit 순으로 실행됨.
+      - 만일 maximum-pool-size이 10이고 한번에 10개의 요청이들어올 경우 tx A 가 connection을 모두 가져가게 되므로 tx B 는 connection이 반납될 때까지 대기함.
+        이런경우 connection점유 이슈가 생길 수 있어 근본적인 해결은 lock획득 전에 tx를 생성하지 않는게 좋을듯.
+        무조건 transactional 밖에서 lock을 획득하자!! 
 - Lock 경과시간 만료후 Lock 에 접근하게 될 수도 있다.
      만약 A 프로세스가 Lock 을 취득한 후 leaseTime 을 1초로 설정했다고 해봅시다.
      근데 A 프로세스의 작업이 2초가 걸리는 작업이였다면 이미 Lock 은 leaseTime 이 경과하여 도중에 해제가 되었을 테고, A 프로세스는 Lock 에 대해서 Monitor 상태가 아닌데 Lock 을 해제하려고 할 것 입니다.
