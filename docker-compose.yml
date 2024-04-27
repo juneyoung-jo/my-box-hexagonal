@@ -1,8 +1,17 @@
-version : "3"
-services :
+services:
   redis:
     image: redis:latest
     container_name: redis
     hostname: localhost
     ports:
       - "6379:6379"
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    hostname: localhost
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: mybox
+      MYSQL_ROOT_PASSWORD: admin
+      TZ: Asia/Seoul
