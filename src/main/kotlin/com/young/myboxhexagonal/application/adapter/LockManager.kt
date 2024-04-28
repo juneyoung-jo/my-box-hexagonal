@@ -4,9 +4,7 @@ import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.support.TransactionSynchronizationManager.getCurrentTransactionName
-import org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive
-import java.lang.RuntimeException
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 @Component
@@ -23,6 +21,7 @@ class LockManager(
      */
     fun <R> lock(
         key: String,
+        num: Int,
         timeUnit: TimeUnit = TimeUnit.MILLISECONDS,
         waitTime: Long = 5000L,
         leaseTime: Long = 3000L,
@@ -37,16 +36,18 @@ class LockManager(
             )
 
         if (!available) {
-            println("lock 획득 실패")
+            println("${LocalDateTime.now()} [${Thread.currentThread().name}] lock 획득 실패 key: $key, num: $num")
             throw RuntimeException("Can't lock")
+        }else{
+            println("${LocalDateTime.now()} [${Thread.currentThread().name}] lock 획득 key: $key, num: $num")
         }
 
         try {
-            println("lock 획득 시도" + key)
             // transaction의 이름과 transacitonal이 적용되었는지 확인
 //            println("tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
 //            println("get Lock = ${Thread.currentThread()}")
             return txAdvise.requireNew {
+                println("${LocalDateTime.now()} [${Thread.currentThread().name}] tx open")
                 // transaction의 이름과 new transacitonal 이 적용되었는지 확인
 //                println("new tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
                 func()
@@ -56,10 +57,10 @@ class LockManager(
         } finally {
 //            println("final tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
             try {
-                println("lock 해제")
                 unlock(key)
+                println("${LocalDateTime.now()} [${Thread.currentThread().name}] lock 해제 key: $key, num: $num")
             } catch (e: IllegalMonitorStateException) {
-                println("IllegalMonitorStateException")
+                println("${LocalDateTime.now()} [${Thread.currentThread().name}] IllegalMonitorStateException")
             }
 
         }

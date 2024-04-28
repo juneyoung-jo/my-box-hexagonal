@@ -70,7 +70,7 @@ internal class StorageLockServiceTest {
 
         for (i in 1..size) {
             executorService.execute {
-                storageService.increaseFileSizeWithRedisLockByNonTransactional(1)
+                storageService.increaseFileSizeWithRedisLockByNonTransactional(1, i)
                 countDownLatch.countDown()
             }
         }
@@ -96,7 +96,7 @@ internal class StorageLockServiceTest {
 
         for (i in 1..size) {
             executorService.execute {
-                storageService.increaseFileSizeWithRedisLockByTransactional(1)
+                storageService.increaseFileSizeWithRedisLockByTransactional(1, i)
                 countDownLatch.countDown()
             }
         }
