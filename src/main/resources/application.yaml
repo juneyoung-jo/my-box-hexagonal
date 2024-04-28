@@ -1,10 +1,17 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/mybox?useSSL=false&characterEncoding=UTF-8&tlsVersion=TLSv1:2&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/mybox?useSSL=false&characterEncoding=UTF-8&tlsVersion=TLSv1:2&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
+    password: admin
     hikari:
       maximum-pool-size: 15
+  sql:
+    init:
+      schema-locations: classpath:sql/schema/**.sql
+      data-locations:
+        - classpath:sql/data/**.sql
+      mode: always
   data:
     redis:
       host: localhost
@@ -16,6 +23,7 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
     #        default_batch_fetch_size: 100
 #        show_sql: false
 #        format_sql: true
