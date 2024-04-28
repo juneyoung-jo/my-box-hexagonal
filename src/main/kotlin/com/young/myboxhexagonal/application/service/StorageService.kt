@@ -48,8 +48,8 @@ class StorageService(
             }
 
     @Transactional(propagation = Propagation.NEVER)
-    fun increaseFileSizeWithRedisLockByNonTransactional(storageId: Long): Storage =
-        lockManager.lock(key = storageId.toString()) {
+    fun increaseFileSizeWithRedisLockByNonTransactional(storageId: Long,  num: Int): Storage =
+        lockManager.lock(key = storageId.toString(),  num = num) {
             storagePersistencePort.findById(storageId)!!
                 .increaseFileSize()
                 .run {
@@ -58,8 +58,8 @@ class StorageService(
         }
 
     @Transactional
-    fun increaseFileSizeWithRedisLockByTransactional(storageId: Long): Storage =
-        lockManager.lock(key = storageId.toString()) {
+    fun increaseFileSizeWithRedisLockByTransactional(storageId: Long, num: Int): Storage =
+        lockManager.lock(key = storageId.toString(), num = num) {
             storagePersistencePort.findById(storageId)!!
                 .increaseFileSize()
                 .run {

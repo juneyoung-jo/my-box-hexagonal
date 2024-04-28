@@ -5,7 +5,7 @@ spring:
     username: root
     password: admin
     hikari:
-      maximum-pool-size: 15
+      maximum-pool-size: 10
   sql:
     init:
       schema-locations: classpath:sql/schema/**.sql
@@ -32,8 +32,4 @@ spring:
 #    property-naming-strategy: SNAKE_CASE
 #    deserialization:
 #      FAIL_ON_NULL_FOR_PRIMITIVES: true
-logging:
-  level:
-    ROOT: info
-#    org.hibernate.SQL: debug
-#  org.hibernate.type: trace
+

@@ -43,11 +43,14 @@ class DistributedLockAop(
         }"
         val rLock: RLock = redissonClient.getLock(key)
 
+        val available = rLock.tryLock(distributedLock.waitTime, distributedLock.leaseTime, distributedLock.timeUnit)
+        if (!available) {
+            println("[${Thread.currentThread().name}] lock 획득 실패 key: $key")
+            return false
+        }else{
+            println("[${Thread.currentThread().name}] lock 획득 key: $key")
+        }
         return try {
-            val available = rLock.tryLock(distributedLock.waitTime, distributedLock.leaseTime, distributedLock.timeUnit)
-            if (!available) {
-                return false
-            }
             println("tx = " + getCurrentTransactionName() + " " + isActualTransactionActive())
             println("get Lock aop = ${Thread.currentThread()}")
             aopForTransaction.proceed(joinPoint)
