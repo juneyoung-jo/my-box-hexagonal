@@ -129,7 +129,6 @@ internal class StorageLockServiceTest {
     }
 
     @Test
-//    @Disabled(value = "실패하는 테스트, disabled 처리 Deadlock")
     @Order(6)
     fun TxTestService에서_transactional매서드에서_lock_method를_호출할때() {
         val size = 10
